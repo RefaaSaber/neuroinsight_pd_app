@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import '../services/db_helper.dart';
 import '../theme/app_theme.dart';
 import 'signup/signup_step1_screen.dart';
 import 'main_shell.dart';
 import 'forgot_password_screen.dart';
 
-/// Frame 2 — Log In.
+/// Frame 2 — Log In. Authenticates against Firebase, using National ID
+/// to look up the account's email, then signing in with Firebase Auth.
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -16,6 +18,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final _nationalIdController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscure = true;
+  bool _loading = false;
+  String? _errorText;
 
   @override
   void dispose() {
@@ -24,10 +28,31 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _login() {
-    // TODO: replace with a real authentication call to the backend.
+  Future<void> _login() async {
+    setState(() => _errorText = null);
+
+    if (_nationalIdController.text.trim().isEmpty || _passwordController.text.isEmpty) {
+      setState(() => _errorText = 'Please enter your National ID and password.');
+      return;
+    }
+
+    setState(() => _loading = true);
+
+    final user = await DbHelper.instance.login(
+      nationalId: _nationalIdController.text.trim(),
+      password: _passwordController.text,
+    );
+
+    if (!mounted) return;
+    setState(() => _loading = false);
+
+    if (user == null) {
+      setState(() => _errorText = 'Incorrect National ID or password.');
+      return;
+    }
+
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const MainShell()),
+      MaterialPageRoute(builder: (_) => MainShell(user: user)),
       (route) => false,
     );
   }
@@ -54,11 +79,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   const Expanded(
                     child: Column(
                       children: [
-                        CircleAvatar(
-                          radius: 22,
-                          backgroundColor: Colors.white24,
-                          child: Text('🧠', style: TextStyle(fontSize: 20), textAlign: TextAlign.center),
-                        ),
+                        Text('🧠', style: TextStyle(fontSize: 26)),
                         SizedBox(height: 8),
                         Text('NeuroInsight-PD', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
                       ],
@@ -90,7 +111,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text('Password', style: TextStyle(fontWeight: FontWeight.w600)),
-                                                TextButton(
+                        TextButton(
                           onPressed: () => Navigator.of(context).push(
                             MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()),
                           ),
@@ -110,8 +131,21 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
+                    if (_errorText != null) ...[
+                      const SizedBox(height: 12),
+                      Text(_errorText!, style: const TextStyle(color: AppColors.danger, fontSize: 13)),
+                    ],
                     const SizedBox(height: 28),
-                    ElevatedButton(onPressed: _login, child: const Text('Log In')),
+                    ElevatedButton(
+                      onPressed: _loading ? null : _login,
+                      child: _loading
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                            )
+                          : const Text('Log In'),
+                    ),
                     const SizedBox(height: 20),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,

@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../models/signup_data.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/signup_header.dart';
 import 'signup_step3_screen.dart';
 
 /// Frame 4 — Sign Up Step 2 of 3: Verify Your Number (OTP).
 class SignUpStep2Screen extends StatefulWidget {
-  const SignUpStep2Screen({super.key});
+  final SignupData data;
+  const SignUpStep2Screen({super.key, required this.data});
 
   @override
   State<SignUpStep2Screen> createState() => _SignUpStep2ScreenState();
@@ -66,9 +68,9 @@ class _SignUpStep2ScreenState extends State<SignUpStep2Screen> {
                   children: [
                     const Text('Enter Verification Code', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 4),
-                    const Text(
-                      'A 6-digit code was sent to your phone number\n+966 5XX XXX XXXX',
-                      style: TextStyle(color: AppColors.textSecondary),
+                    Text(
+                      'A 6-digit code was sent to your phone number\n${widget.data.phone}',
+                      style: const TextStyle(color: AppColors.textSecondary),
                     ),
                     const SizedBox(height: 24),
                     Row(
@@ -110,7 +112,7 @@ class _SignUpStep2ScreenState extends State<SignUpStep2Screen> {
                     const SizedBox(height: 28),
                     ElevatedButton(
                       onPressed: () => Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const SignUpStep3Screen()),
+                        MaterialPageRoute(builder: (_) => SignUpStep3Screen(data: widget.data)),
                       ),
                       child: const Text('Verify & Continue'),
                     ),

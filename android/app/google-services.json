@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "6670229919",
+    "project_id": "neuroinsight-784ee",
+    "storage_bucket": "neuroinsight-784ee.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:6670229919:android:ffc2830fe992d360481daa",
+        "android_client_info": {
+          "package_name": "com.example.neuroinsight_pd_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBQfmIkO0iN2unL83oqBCXVacRK-pGUXXI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

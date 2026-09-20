@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import '../models/user_model.dart';
-import '../widgets/bottom_nav_bar.dart';
+import '../theme/app_theme.dart';
 import 'home_tab.dart';
 import 'upload_tab.dart';
 import 'reports_tab.dart';
 import 'profile_tab.dart';
 
-/// Hosts the bottom-navigation shell (Home / Upload / Report / Profile),
-/// mirroring frames 6, 7-9, 9, and 11 of the design. Each tab keeps its own
-/// scroll position thanks to IndexedStack.
+/// Hosts the bottom-navigation shell (Home / Upload / Report / Profile).
 class MainShell extends StatefulWidget {
-  const MainShell({super.key});
+  final UserModel user;
+  const MainShell({super.key, required this.user});
 
   @override
   State<MainShell> createState() => _MainShellState();
@@ -18,22 +17,38 @@ class MainShell extends StatefulWidget {
 
 class _MainShellState extends State<MainShell> {
   int _index = 0;
-  final UserModel _user = UserModel.mock();
+  int _homeRefreshKey = 0;
 
-  void _goToTab(int i) => setState(() => _index = i);
+  void _refreshHome() {
+    setState(() {
+      _homeRefreshKey++;
+      _index = 0;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final tabs = [
-      HomeTab(user: _user, onUploadTapped: () => _goToTab(1)),
-      UploadTab(user: _user),
-      ReportsTab(user: _user),
-      ProfileTab(user: _user),
+      HomeTab(key: ValueKey(_homeRefreshKey), user: widget.user, onUploadTapped: () => setState(() => _index = 1)),
+      UploadTab(user: widget.user, onTestUploaded: _refreshHome),
+      ReportsTab(user: widget.user),
+      ProfileTab(user: widget.user),
     ];
 
     return Scaffold(
-      body: SafeArea(child: IndexedStack(index: _index, children: tabs)),
-      bottomNavigationBar: AppBottomNavBar(currentIndex: _index, onTap: _goToTab),
+      body: SafeArea(child: tabs[_index]),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _index,
+        onDestinationSelected: (i) => setState(() => _index = i),
+        backgroundColor: Colors.white,
+        indicatorColor: AppColors.primary.withOpacity(0.12),
+        destinations: const [
+          NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home, color: AppColors.primary), label: 'Home'),
+          NavigationDestination(icon: Icon(Icons.upload_outlined), selectedIcon: Icon(Icons.upload, color: AppColors.primary), label: 'Upload'),
+          NavigationDestination(icon: Icon(Icons.description_outlined), selectedIcon: Icon(Icons.description, color: AppColors.primary), label: 'Reports'),
+          NavigationDestination(icon: Icon(Icons.person_outline), selectedIcon: Icon(Icons.person, color: AppColors.primary), label: 'Profile'),
+        ],
+      ),
     );
   }
 }

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import '../services/db_helper.dart';
 import '../theme/app_theme.dart';
 
-/// Forgot Password flow: user enters their email, taps "Send Reset Code",
-/// and sees a confirmation that a code was sent.
+/// Forgot Password flow: user enters their email, and Firebase sends a
+/// real password-reset link to that address.
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
 
@@ -13,6 +14,7 @@ class ForgotPasswordScreen extends StatefulWidget {
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _emailController = TextEditingController();
   String? _errorText;
+  bool _loading = false;
 
   @override
   void dispose() {
@@ -22,7 +24,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   bool get _isValidEmail => RegExp(r'^[\w.+-]+@[\w-]+\.[\w.-]+$').hasMatch(_emailController.text.trim());
 
-  void _sendCode() {
+  Future<void> _sendCode() async {
     setState(() {
       _errorText = _emailController.text.trim().isEmpty
           ? 'Please enter your email address.'
@@ -30,7 +32,19 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     });
     if (_errorText != null) return;
 
-    // TODO: call the backend to actually send a password-reset code.
+    setState(() => _loading = true);
+
+    final email = _emailController.text.trim();
+    final sent = await DbHelper.instance.sendPasswordResetEmail(email);
+
+    if (!mounted) return;
+    setState(() => _loading = false);
+
+    if (!sent) {
+      setState(() => _errorText = 'No account found with that email address.');
+      return;
+    }
+
     showDialog(
       context: context,
       builder: (dialogContext) => Dialog(
@@ -47,10 +61,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 child: const Icon(Icons.mark_email_read_outlined, color: Colors.white, size: 32),
               ),
               const SizedBox(height: 20),
-              const Text('Code Sent!', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+              const Text('Email Sent!', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
               const SizedBox(height: 10),
               Text(
-                'A password reset code has been sent to ${_emailController.text.trim()}.',
+                'A password reset link has been sent to $email. Open it on this device to set a new password.',
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
               ),
@@ -111,7 +125,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     const Text('Reset your password', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 6),
                     const Text(
-                      "Enter the email address linked to your account and we'll send you a code to reset your password.",
+                      "Enter the email address linked to your account and we'll send you a link to reset your password.",
                       style: TextStyle(color: AppColors.textSecondary),
                     ),
                     const SizedBox(height: 24),
@@ -128,7 +142,16 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       Text(_errorText!, style: const TextStyle(color: AppColors.danger, fontSize: 12)),
                     ],
                     const SizedBox(height: 28),
-                    ElevatedButton(onPressed: _sendCode, child: const Text('Send Reset Code')),
+                    ElevatedButton(
+                      onPressed: _loading ? null : _sendCode,
+                      child: _loading
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                            )
+                          : const Text('Send Reset Link'),
+                    ),
                   ],
                 ),
               ),

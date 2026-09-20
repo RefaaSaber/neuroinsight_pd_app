@@ -1,6 +1,7 @@
-/// Simple in-memory user/patient model. In a real app this would come from
-/// the backend after login; here it is mock data for the frontend demo.
+/// A signed-in patient's account, backed by Firebase Authentication +
+/// Firestore (see lib/services/db_helper.dart).
 class UserModel {
+  final String? id;
   final String fullName;
   final String displayName;
   final String role;
@@ -11,6 +12,7 @@ class UserModel {
   String phoneNumber;
 
   UserModel({
+    this.id,
     required this.fullName,
     required this.displayName,
     required this.role,
@@ -27,18 +29,5 @@ class UserModel {
       return (parts[0][0] + parts[1][0]).toUpperCase();
     }
     return displayName.isNotEmpty ? displayName[0].toUpperCase() : '?';
-  }
-
-  static UserModel mock() {
-    return UserModel(
-      fullName: 'Sara Mohammed Al-Harbi',
-      displayName: 'Sara Al-Harbi',
-      role: 'Patient',
-      nationalId: '1098765432',
-      dateOfBirth: '15 / 03 / 1962',
-      hospitalFileNo: 'KAU-2026-003841',
-      email: 'SaraAl-Harbi@gmail.com',
-      phoneNumber: '966+ 55 904 3628',
-    );
   }
 }
