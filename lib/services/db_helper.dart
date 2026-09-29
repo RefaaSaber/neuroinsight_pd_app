@@ -117,17 +117,30 @@ class DbHelper {
     }).toList();
   }
 
+  /// Saves a test record. When [predictionResult] is given (currently only
+  /// for voice tests, since that's the only model wired up so far), it's
+  /// stored alongside the test so the Reports tab can show a real result.
   Future<void> addTest({
     required String userId,
     required String title,
     required String date,
     required TestType type,
+    Map<String, dynamic>? predictionResult,
   }) async {
-    await _db.collection('users').doc(userId).collection('tests').add({
+    final data = <String, dynamic>{
       'title': title,
       'date': date,
       'type': type == TestType.voice ? 'voice' : 'drawing',
       'createdAt': FieldValue.serverTimestamp(),
-    });
+      // 'pending_review' once an AI prediction exists for the doctor's
+      // website to pick up; 'uploaded' otherwise (e.g. drawing tests,
+      // which have no model yet). The doctor's website should update this
+      // to 'reviewed' once a report has been written for this test.
+      'status': predictionResult != null ? 'pending_review' : 'uploaded',
+    };
+    if (predictionResult != null) {
+      data['prediction'] = predictionResult;
+    }
+    await _db.collection('users').doc(userId).collection('tests').add(data);
   }
 }
