@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/db_helper.dart';
 import '../theme/app_theme.dart';
+import '../widgets/brand_mark.dart';
 import 'signup/signup_step1_screen.dart';
 import 'main_shell.dart';
 import 'forgot_password_screen.dart';
@@ -76,10 +77,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: () => Navigator.of(context).maybePop(),
                     icon: const Icon(Icons.arrow_back, color: Colors.white),
                   ),
-                  const Expanded(
+                  Expanded(
                     child: Column(
-                      children: [
-                        Text('🧠', style: TextStyle(fontSize: 26)),
+                      children: const [
+                        BrandMark(onDark: true, size: 36),
                         SizedBox(height: 8),
                         Text('NeuroInsight-PD', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
                       ],

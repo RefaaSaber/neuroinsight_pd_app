@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import '../widgets/brand_mark.dart';
 import 'login_screen.dart';
 import 'signup/signup_step1_screen.dart';
 
@@ -22,13 +23,7 @@ class WelcomeScreen extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                                       Container(
-                      width: 96,
-                      height: 96,
-                      alignment: Alignment.center,
-                      decoration: const BoxDecoration(color: Colors.white24, shape: BoxShape.circle),
-                      child: const Text('🧠', style: TextStyle(fontSize: 48), textAlign: TextAlign.center),
-                    ),
+                    const BrandMark(onDark: true, size: 88),
                     const SizedBox(height: 20),
                     const Text(
                       'NeuroInsight-PD',

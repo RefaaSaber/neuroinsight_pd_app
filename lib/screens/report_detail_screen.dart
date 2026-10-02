@@ -29,12 +29,37 @@ class ReportDetailScreen extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(user.displayName, style: const TextStyle(fontWeight: FontWeight.w600)),
-                    Text('${report.date}  •  ${report.doctorName}', style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                    Text(report.title, style: const TextStyle(fontWeight: FontWeight.w600)),
+                    Text('${report.reportWrittenDate}  •  ${report.doctorName}', style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                   ],
                 ),
               ],
             ),
+            if (report.testTypeLabels.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.only(top: 6),
+                    child: Text('Covers:', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                  ),
+                  for (final label in report.testTypeLabels)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: AppColors.chipNewBg,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        label,
+                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.primary),
+                      ),
+                    ),
+                ],
+              ),
+            ],
             const SizedBox(height: 20),
             Container(
               width: double.infinity,
@@ -43,63 +68,46 @@ class ReportDetailScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("Doctor's Diagnosis", style: TextStyle(fontWeight: FontWeight.w700)),
+                  const Text("Doctor's Assessment", style: TextStyle(fontWeight: FontWeight.w700)),
                   const SizedBox(height: 12),
-                  _detailRow('Diagnosis Result:', report.diagnosisResult, valueChip: true, chipColor: AppColors.chipViewedBg, chipTextColor: AppColors.chipViewedText),
-                  const SizedBox(height: 10),
-                  _detailRow('Risk Level:', report.riskLevel, valueChip: true, chipColor: AppColors.warning.withOpacity(0.15), chipTextColor: AppColors.warning),
-                  const SizedBox(height: 10),
-                  Text('Report written: ${report.reportWrittenDate}', style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                  Text(report.clinicalNotes.isEmpty ? 'No notes provided.' : report.clinicalNotes),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: cardDecoration(),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Treatment Plan & Recommendations', style: TextStyle(fontWeight: FontWeight.w700)),
-                  const SizedBox(height: 12),
-                  ...report.recommendations.map((rec) => Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Padding(
-                              padding: EdgeInsets.only(top: 6),
-                              child: Icon(Icons.circle, size: 6, color: AppColors.primary),
+            if (report.recommendations.trim().isNotEmpty) ...[
+              const SizedBox(height: 16),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: cardDecoration(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Recommendations', style: TextStyle(fontWeight: FontWeight.w700)),
+                    const SizedBox(height: 12),
+                    ...report.recommendations.split('\n').where((line) => line.trim().isNotEmpty).map(
+                          (line) => Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Padding(
+                                  padding: EdgeInsets.only(top: 6),
+                                  child: Icon(Icons.circle, size: 6, color: AppColors.primary),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(child: Text(line.trim())),
+                              ],
                             ),
-                            const SizedBox(width: 8),
-                            Expanded(child: Text(rec)),
-                          ],
+                          ),
                         ),
-                      )),
-                ],
+                  ],
+                ),
               ),
-            ),
+            ],
           ],
         ),
       ),
-    );
-  }
-
-  Widget _detailRow(String label, String value, {bool valueChip = false, Color? chipColor, Color? chipTextColor}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(label, style: const TextStyle(color: AppColors.textSecondary)),
-        if (valueChip)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(color: chipColor, borderRadius: BorderRadius.circular(20)),
-            child: Text(value, style: TextStyle(color: chipTextColor, fontWeight: FontWeight.w600, fontSize: 12)),
-          )
-        else
-          Text(value, style: const TextStyle(fontWeight: FontWeight.w600)),
-      ],
     );
   }
 }

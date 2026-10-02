@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
 import '../models/report_model.dart';
 import '../models/user_model.dart';
 
@@ -36,6 +37,12 @@ class DbHelper {
         'phone': phone,
         'dateOfBirth': dateOfBirth,
         'hospitalFileNo': hospitalFileNo,
+        // Lets the doctor/radiologist web portal tell patient accounts apart
+        // from clinical staff accounts, which get 'doctor' / 'radiologist'
+        // here instead. Patients made before this field existed are treated
+        // as patients too (see the web repository's handling of a missing
+        // role).
+        'role': 'patient',
       });
 
       return UserModel(
@@ -134,13 +141,62 @@ class DbHelper {
       'createdAt': FieldValue.serverTimestamp(),
       // 'pending_review' once an AI prediction exists for the doctor's
       // website to pick up; 'uploaded' otherwise (e.g. drawing tests,
-      // which have no model yet). The doctor's website should update this
-      // to 'reviewed' once a report has been written for this test.
+      // which have no model yet). The doctor's website updates this to
+      // 'reviewed' once a report has been written for this test.
       'status': predictionResult != null ? 'pending_review' : 'uploaded',
     };
     if (predictionResult != null) {
       data['prediction'] = predictionResult;
     }
     await _db.collection('users').doc(userId).collection('tests').add(data);
+  }
+
+  /// Diagnostic reports a doctor has submitted (on the web portal) —
+  /// each one covers one or more of this patient's tests — newest first.
+  /// A saved-but-not-submitted draft doesn't appear here yet — only once
+  /// the doctor submits it.
+  Future<List<ReportModel>> getReports(String userId) async {
+    final snapshot = await _db
+        .collection('users')
+        .doc(userId)
+        .collection('reports')
+        .orderBy('writtenAt', descending: true)
+        .get();
+
+    final reports = <ReportModel>[];
+    for (final doc in snapshot.docs) {
+      final data = doc.data();
+      if (data['status'] != 'submitted') continue;
+
+      final writtenAt = data['writtenAt'];
+      final writtenDate = writtenAt is Timestamp
+          ? DateFormat('MMM d, yyyy').format(writtenAt.toDate())
+          : '';
+
+      reports.add(ReportModel(
+        id: doc.id,
+        testIds: List<String>.from(data['testIds'] as List? ?? const []),
+        testTypeLabels:
+            List<String>.from(data['testTypeLabels'] as List? ?? const []),
+        title: data['title'] as String? ?? 'Report',
+        doctorName: data['doctorName'] as String? ?? 'Doctor',
+        status: (data['reportViewed'] as bool? ?? false) ? ReportStatus.viewed : ReportStatus.new_,
+        clinicalNotes: data['clinicalNotes'] as String? ?? '',
+        recommendations: data['recommendations'] as String? ?? '',
+        reportWrittenDate: writtenDate,
+      ));
+    }
+    return reports;
+  }
+
+  /// Marks a report as read once the patient opens it, so it stops showing
+  /// as "new" in the Reports tab.
+  Future<void> markReportViewed(String userId, String reportId) async {
+    await _db
+        .collection('users')
+        .doc(userId)
+        .collection('reports')
+        .doc(reportId)
+        .update({'reportViewed': true});
   }
 }
