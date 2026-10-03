@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import '../models/report_model.dart';
 import '../models/user_model.dart';
+import '../services/cloudinary_upload_service.dart';
 import '../services/db_helper.dart';
 import '../services/drawing_model_service.dart';
 import '../services/voice_model_service.dart';
@@ -180,6 +181,24 @@ class _UploadTabState extends State<UploadTab> {
         filename: fileName,
       );
 
+      // Also upload the actual photo to Cloudinary (same account the
+      // website uses) so the doctor can open the original drawing, not
+      // just see the AI's prediction. If this upload fails for any reason
+      // (e.g. no network), the test is still saved without an image link
+      // rather than losing the AI result the patient is waiting on.
+      if (mounted) {
+        setState(() => _savingMessage = 'Saving drawing image...');
+      }
+      String? fileUrl;
+      try {
+        fileUrl = await CloudinaryUploadService.instance.uploadImage(
+          bytes: bytes,
+          filename: fileName,
+        );
+      } catch (_) {
+        fileUrl = null;
+      }
+
       final date = DateFormat('MMM d, yyyy').format(DateTime.now());
       await DbHelper.instance.addTest(
         userId: userId,
@@ -187,6 +206,7 @@ class _UploadTabState extends State<UploadTab> {
         date: date,
         type: TestType.drawing,
         predictionResult: prediction.toFirestoreMap(),
+        fileUrl: fileUrl,
       );
 
       if (!mounted) return;

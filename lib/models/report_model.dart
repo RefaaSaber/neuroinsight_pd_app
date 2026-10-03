@@ -51,5 +51,15 @@ class RecentTestModel {
   final String date;
   final TestType type;
 
-  const RecentTestModel({required this.title, required this.date, required this.type});
+  /// Link to the uploaded photo (spiral drawing), if one was saved —
+  /// null for a voice test, or an older drawing test uploaded before this
+  /// was tracked.
+  final String? fileUrl;
+
+  const RecentTestModel({
+    required this.title,
+    required this.date,
+    required this.type,
+    this.fileUrl,
+  });
 }

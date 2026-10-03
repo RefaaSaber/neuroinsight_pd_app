@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/user_model.dart';
 import '../services/db_helper.dart';
 import '../theme/app_theme.dart';
+import '../widgets/brand_mark.dart';
 import 'welcome_screen.dart';
 
 /// My Profile — editable email/phone (saved to Firestore) and Sign Out.
@@ -140,12 +141,7 @@ class _ProfileTabState extends State<ProfileTab> {
             children: [
               const Text('My Profile', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
               const SizedBox(height: 16),
-              Container(
-                width: 72,
-                height: 72,
-                decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
-                child: const Center(child: Text('🧠', style: TextStyle(fontSize: 30))),
-              ),
+              const BrandMark(size: 72),
               const SizedBox(height: 10),
               Text(user.displayName, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
               Text(user.role, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),

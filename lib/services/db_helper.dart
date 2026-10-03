@@ -130,6 +130,7 @@ class DbHelper {
         title: data['title'] as String,
         date: data['date'] as String,
         type: (data['type'] as String) == 'voice' ? TestType.voice : TestType.drawing,
+        fileUrl: data['fileUrl'] as String?,
       );
     }).toList();
   }
@@ -137,13 +138,16 @@ class DbHelper {
   /// Saves a test record. When [predictionResult] is given (voice and
   /// drawing tests both have live models now), it's stored alongside the
   /// test so the Reports tab — and the doctor's website — can show a real
-  /// result.
+  /// result. When [fileUrl] is given (e.g. a drawing photo uploaded to
+  /// Cloudinary), the doctor's website can open the original file, not
+  /// just see the AI's prediction.
   Future<void> addTest({
     required String userId,
     required String title,
     required String date,
     required TestType type,
     Map<String, dynamic>? predictionResult,
+    String? fileUrl,
   }) async {
     final data = <String, dynamic>{
       'title': title,
@@ -158,6 +162,9 @@ class DbHelper {
     };
     if (predictionResult != null) {
       data['prediction'] = predictionResult;
+    }
+    if (fileUrl != null) {
+      data['fileUrl'] = fileUrl;
     }
     await _db.collection('users').doc(userId).collection('tests').add(data);
   }

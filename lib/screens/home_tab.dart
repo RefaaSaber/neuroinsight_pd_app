@@ -3,6 +3,7 @@ import '../models/report_model.dart';
 import '../models/user_model.dart';
 import '../services/db_helper.dart';
 import '../theme/app_theme.dart';
+import 'image_viewer_screen.dart';
 
 /// Home tab: shows monitoring status, quick actions, and the signed-in
 /// user's recent tests loaded from Firestore.
@@ -39,6 +40,19 @@ class _HomeTabState extends State<HomeTab> {
       _tests = tests;
       _loading = false;
     });
+  }
+
+  // Opens the full-size image for a test that has one. Voice tests (and
+  // any older drawing test with no saved image) have no [fileUrl], so
+  // tapping those rows does nothing.
+  void _openTest(RecentTestModel test) {
+    final url = test.fileUrl;
+    if (url == null) return;
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ImageViewerScreen(imageUrl: url, title: test.title),
+      ),
+    );
   }
 
   // Picks the right icon for a test's type.
@@ -158,12 +172,52 @@ class _HomeTabState extends State<HomeTab> {
                   else
                     ..._tests.map((t) => Padding(
                           padding: const EdgeInsets.only(bottom: 10),
-                          child: Container(
+                          child: InkWell(
+                            onTap: t.fileUrl != null ? () => _openTest(t) : null,
+                            borderRadius: BorderRadius.circular(14),
+                            child: Container(
                             padding: const EdgeInsets.all(14),
                             decoration: cardDecoration(),
                             child: Row(
                               children: [
-                                CircleAvatar(backgroundColor: AppColors.chipNewBg, child: Icon(_iconFor(t.type), color: AppColors.primary, size: 18)),
+                                // Shows a thumbnail of the uploaded photo
+                                // when one was saved (drawing tests only),
+                                // so the patient can see what they
+                                // submitted — falls back to the plain
+                                // icon avatar otherwise (voice tests, or
+                                // an older drawing test with no saved
+                                // image).
+                                if (t.fileUrl != null)
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.network(
+                                      t.fileUrl!,
+                                      width: 44,
+                                      height: 44,
+                                      fit: BoxFit.cover,
+                                      loadingBuilder: (context, child, progress) {
+                                        if (progress == null) return child;
+                                        return Container(
+                                          width: 44,
+                                          height: 44,
+                                          color: AppColors.chipNewBg,
+                                          child: const Center(
+                                            child: SizedBox(
+                                              width: 16,
+                                              height: 16,
+                                              child: CircularProgressIndicator(strokeWidth: 2),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      errorBuilder: (context, error, stackTrace) => CircleAvatar(
+                                        backgroundColor: AppColors.chipNewBg,
+                                        child: Icon(_iconFor(t.type), color: AppColors.primary, size: 18),
+                                      ),
+                                    ),
+                                  )
+                                else
+                                  CircleAvatar(backgroundColor: AppColors.chipNewBg, child: Icon(_iconFor(t.type), color: AppColors.primary, size: 18)),
                                 const SizedBox(width: 12),
                                 // Expanded + ellipsis so a long auto-generated
                                 // filename (e.g. from the image picker) is cut
@@ -183,7 +237,10 @@ class _HomeTabState extends State<HomeTab> {
                                     ],
                                   ),
                                 ),
+                                if (t.fileUrl != null)
+                                  const Icon(Icons.chevron_right, color: AppColors.textSecondary),
                               ],
+                            ),
                             ),
                           ),
                         )),
