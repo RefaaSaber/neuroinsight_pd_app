@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import '../models/report_model.dart';
 import '../theme/app_theme.dart';
 
-/// Frames 12 & 13 — "Upload Successful!" confirmation, shared by both the
-/// voice and the drawing upload flows.
+/// "Upload Successful!" confirmation, shared by both the voice and the
+/// drawing upload flows.
 class UploadSuccessScreen extends StatelessWidget {
   final TestType testType;
 

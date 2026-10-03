@@ -1,3 +1,4 @@
+// The app's reusable brand mark widget (logo badge).
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 

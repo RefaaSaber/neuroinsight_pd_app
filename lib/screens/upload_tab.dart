@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +8,7 @@ import 'package:intl/intl.dart';
 import '../models/report_model.dart';
 import '../models/user_model.dart';
 import '../services/db_helper.dart';
+import '../services/drawing_model_service.dart';
 import '../services/voice_model_service.dart';
 import '../theme/app_theme.dart';
 import 'upload_success_screen.dart';
@@ -13,7 +16,8 @@ import 'upload_success_screen.dart';
 /// Frame 7 — Upload Tests. Voice tests are submitted as a CSV file of
 /// pre-extracted acoustic features (matching the NeuroInsight-PD voice
 /// model's expected columns) and sent to the model for a real prediction.
-/// Drawing tests are just saved for now — no drawing model exists yet.
+/// Drawing tests are submitted as a photo, sent to the drawing model for a
+/// real prediction the same way.
 class UploadTab extends StatefulWidget {
   final UserModel user;
   final VoidCallback? onTestUploaded;
@@ -29,6 +33,7 @@ class _UploadTabState extends State<UploadTab> {
   bool _picking = false;
   String _savingMessage = 'Uploading...';
 
+  // Lets the user pick a CSV file, parses its features, and runs the voice prediction.
   Future<void> _pickVoiceFile() async {
     if (_picking) return;
     _picking = true;
@@ -58,9 +63,8 @@ class _UploadTabState extends State<UploadTab> {
     }
   }
 
-  /// Parses the first data row of a CSV whose header row contains (at
-  /// least) the columns the voice model expects. Returns null and shows
-  /// an error if the file doesn't have the required columns.
+  // Reads the first data row of the CSV into the feature values the voice
+  // model expects. Returns null and shows an error if columns are missing.
   Map<String, double>? _parseFeaturesFromCsv(String content) {
     final rows = const CsvToListConverter(eol: '\n').convert(content);
     if (rows.length < 2) {
@@ -97,6 +101,8 @@ class _UploadTabState extends State<UploadTab> {
     return features;
   }
 
+  // Sends the voice features to the model, saves the result, and shows
+  // the success screen.
   Future<void> _runVoicePrediction({required String fileName, required Map<String, double> features}) async {
     final userId = widget.user.id;
     if (userId == null) return;
@@ -137,6 +143,7 @@ class _UploadTabState extends State<UploadTab> {
     }
   }
 
+  // Lets the user pick a photo of a drawing and runs the drawing prediction.
   Future<void> _pickDrawingImage() async {
     if (_picking) return;
     _picking = true;
@@ -144,7 +151,8 @@ class _UploadTabState extends State<UploadTab> {
       final picker = ImagePicker();
       final image = await picker.pickImage(source: ImageSource.gallery);
       if (image == null) return;
-      await _saveDrawingTest(title: image.name);
+      final bytes = await image.readAsBytes();
+      await _runDrawingPrediction(fileName: image.name, bytes: bytes);
     } catch (e) {
       _showError('Could not open the photo picker. Please try again.');
     } finally {
@@ -152,27 +160,49 @@ class _UploadTabState extends State<UploadTab> {
     }
   }
 
-  Future<void> _saveDrawingTest({required String title}) async {
+  // Sends the drawing image to the model, saves the result, and shows
+  // the success screen.
+  Future<void> _runDrawingPrediction({
+    required String fileName,
+    required Uint8List bytes,
+  }) async {
     final userId = widget.user.id;
     if (userId == null) return;
 
     setState(() {
       _saving = true;
-      _savingMessage = 'Uploading...';
+      _savingMessage = 'Analyzing drawing...';
     });
 
-    final date = DateFormat('MMM d, yyyy').format(DateTime.now());
-    await DbHelper.instance.addTest(userId: userId, title: title, date: date, type: TestType.drawing);
+    try {
+      final prediction = await DrawingModelService.instance.predict(
+        bytes: bytes,
+        filename: fileName,
+      );
 
-    if (!mounted) return;
-    setState(() => _saving = false);
+      final date = DateFormat('MMM d, yyyy').format(DateTime.now());
+      await DbHelper.instance.addTest(
+        userId: userId,
+        title: fileName,
+        date: date,
+        type: TestType.drawing,
+        predictionResult: prediction.toFirestoreMap(),
+      );
 
-    await Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const UploadSuccessScreen(testType: TestType.drawing)),
-    );
+      if (!mounted) return;
+      setState(() => _saving = false);
 
-    if (!mounted) return;
-    widget.onTestUploaded?.call();
+      await Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => const UploadSuccessScreen(testType: TestType.drawing)),
+      );
+
+      if (!mounted) return;
+      widget.onTestUploaded?.call();
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _saving = false);
+      _showError(e.toString().replaceFirst('Exception: ', ''));
+    }
   }
 
   void _showError(String message) {
@@ -204,7 +234,7 @@ class _UploadTabState extends State<UploadTab> {
               _UploadCard(
                 icon: Icons.edit_outlined,
                 title: 'Drawing Test',
-                subtitle: 'Upload a photo of a spiral drawing',
+                subtitle: 'Upload a photo of a spiral drawing — sent to the model for a real result',
                 buttonLabel: 'Choose Photo',
                 onTap: _saving ? null : _pickDrawingImage,
               ),
@@ -234,6 +264,7 @@ class _UploadTabState extends State<UploadTab> {
   }
 }
 
+/// A card describing one test type (voice or drawing) with an upload button.
 class _UploadCard extends StatelessWidget {
   final IconData icon;
   final String title;

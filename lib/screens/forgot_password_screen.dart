@@ -1,3 +1,4 @@
+// The Forgot Password screen.
 import 'package:flutter/material.dart';
 import '../services/db_helper.dart';
 import '../theme/app_theme.dart';
@@ -24,6 +25,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   bool get _isValidEmail => RegExp(r'^[\w.+-]+@[\w-]+\.[\w.-]+$').hasMatch(_emailController.text.trim());
 
+  // Validates the email, asks Firebase to send the reset link, and shows
+  // a confirmation dialog on success.
   Future<void> _sendCode() async {
     setState(() {
       _errorText = _emailController.text.trim().isEmpty

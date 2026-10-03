@@ -1,3 +1,4 @@
+// The very first screen the app shows.
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../widgets/brand_mark.dart';
@@ -18,19 +19,19 @@ class WelcomeScreen extends StatelessWidget {
         bottom: false,
         child: Column(
           children: [
-            Expanded(
+            const Expanded(
               child: Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const BrandMark(onDark: true, size: 88),
-                    const SizedBox(height: 20),
-                    const Text(
+                    BrandMark(onDark: true, size: 88),
+                    SizedBox(height: 20),
+                    Text(
                       'NeuroInsight-PD',
                       style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
                     ),
-                    const SizedBox(height: 8),
-                    const Padding(
+                    SizedBox(height: 8),
+                    Padding(
                       padding: EdgeInsets.symmetric(horizontal: 40),
                       child: Text(
                         "Multi-Modal Parkinson's Detection & Telemonitoring System",

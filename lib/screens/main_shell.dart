@@ -1,3 +1,4 @@
+// The main app shell shown after login, with bottom-tab navigation.
 import 'package:flutter/material.dart';
 import '../models/user_model.dart';
 import '../theme/app_theme.dart';
@@ -19,6 +20,8 @@ class _MainShellState extends State<MainShell> {
   int _index = 0;
   int _homeRefreshKey = 0;
 
+  // Forces the Home tab to reload (e.g. after a new test upload) and
+  // switches back to it.
   void _refreshHome() {
     setState(() {
       _homeRefreshKey++;
@@ -41,7 +44,7 @@ class _MainShellState extends State<MainShell> {
         selectedIndex: _index,
         onDestinationSelected: (i) => setState(() => _index = i),
         backgroundColor: Colors.white,
-        indicatorColor: AppColors.primary.withOpacity(0.12),
+        indicatorColor: AppColors.primary.withValues(alpha: 0.12),
         destinations: const [
           NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home, color: AppColors.primary), label: 'Home'),
           NavigationDestination(icon: Icon(Icons.upload_outlined), selectedIcon: Icon(Icons.upload, color: AppColors.primary), label: 'Upload'),

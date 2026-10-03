@@ -1,10 +1,12 @@
+// First screen of the sign-up flow: collects the user's personal info
+// before moving on to phone verification.
 import 'package:flutter/material.dart';
 import '../../models/signup_data.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/signup_header.dart';
 import 'signup_step2_screen.dart';
 
-/// Frame 3 — Sign Up Step 1 of 3: Personal Information.
+/// Sign up step 1 of 3: personal information form.
 class SignUpStep1Screen extends StatefulWidget {
   const SignUpStep1Screen({super.key});
 
@@ -30,6 +32,7 @@ class _SignUpStep1ScreenState extends State<SignUpStep1Screen> {
     super.dispose();
   }
 
+  // Checks all fields are filled, then moves to the next step with the data collected so far.
   void _continue() {
     if (_fullNameController.text.trim().isEmpty ||
         _nationalIdController.text.trim().isEmpty ||

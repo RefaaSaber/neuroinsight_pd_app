@@ -32,6 +32,7 @@ class _ProfileTabState extends State<ProfileTab> {
     super.dispose();
   }
 
+  // Saves the edited email/phone to Firestore and shows a confirmation dialog.
   Future<void> _saveChanges() async {
     final userId = widget.user.id;
     if (userId == null) return;
@@ -79,6 +80,7 @@ class _ProfileTabState extends State<ProfileTab> {
     );
   }
 
+  // Asks the user to confirm before signing out.
   void _confirmSignOut() {
     showDialog(
       context: context,
@@ -104,6 +106,7 @@ class _ProfileTabState extends State<ProfileTab> {
     );
   }
 
+  // Signs the user out and returns to the welcome screen.
   void _signOut() {
     DbHelper.instance.signOut();
     Navigator.of(context).pushAndRemoveUntil(
@@ -112,6 +115,7 @@ class _ProfileTabState extends State<ProfileTab> {
     );
   }
 
+  // Builds a label/value row for a field the user can't edit.
   Widget _readOnlyField(String label, String value) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -140,7 +144,7 @@ class _ProfileTabState extends State<ProfileTab> {
                 width: 72,
                 height: 72,
                 decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
-                child: Center(child: Text('🧠', style: const TextStyle(fontSize: 30))),
+                child: const Center(child: Text('🧠', style: TextStyle(fontSize: 30))),
               ),
               const SizedBox(height: 10),
               Text(user.displayName, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),

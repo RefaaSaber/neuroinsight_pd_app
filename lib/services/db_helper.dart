@@ -1,3 +1,5 @@
+// Database helper: all reads and writes to Firebase Auth / Firestore go
+// through this one class.
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
@@ -14,6 +16,8 @@ class DbHelper {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
+  // Creates the Firebase Auth account and the matching Firestore user
+  // document (always saved with role 'patient'). Returns null on failure.
   Future<UserModel?> createUser({
     required String fullName,
     required String nationalId,
@@ -61,6 +65,8 @@ class DbHelper {
     }
   }
 
+  // Looks up the account by national ID to find its email, then signs in
+  // with Firebase Auth using that email and the given password.
   Future<UserModel?> login({required String nationalId, required String password}) async {
     try {
       final query = await _db.collection('users').where('nationalId', isEqualTo: nationalId).limit(1).get();
@@ -89,10 +95,12 @@ class DbHelper {
     }
   }
 
+  // Signs the current user out of Firebase Auth.
   Future<void> signOut() async {
     await _auth.signOut();
   }
 
+  // Sends Firebase's password-reset email. Returns false if it fails.
   Future<bool> sendPasswordResetEmail(String email) async {
     try {
       await _auth.sendPasswordResetEmail(email: email);
@@ -102,10 +110,12 @@ class DbHelper {
     }
   }
 
+  // Updates the user's saved email and phone number.
   Future<void> updateContact({required String userId, required String email, required String phone}) async {
     await _db.collection('users').doc(userId).update({'email': email, 'phone': phone});
   }
 
+  // Fetches this user's test history, newest first.
   Future<List<RecentTestModel>> getTests(String userId) async {
     final snapshot = await _db
         .collection('users')
@@ -124,9 +134,10 @@ class DbHelper {
     }).toList();
   }
 
-  /// Saves a test record. When [predictionResult] is given (currently only
-  /// for voice tests, since that's the only model wired up so far), it's
-  /// stored alongside the test so the Reports tab can show a real result.
+  /// Saves a test record. When [predictionResult] is given (voice and
+  /// drawing tests both have live models now), it's stored alongside the
+  /// test so the Reports tab — and the doctor's website — can show a real
+  /// result.
   Future<void> addTest({
     required String userId,
     required String title,
@@ -140,9 +151,9 @@ class DbHelper {
       'type': type == TestType.voice ? 'voice' : 'drawing',
       'createdAt': FieldValue.serverTimestamp(),
       // 'pending_review' once an AI prediction exists for the doctor's
-      // website to pick up; 'uploaded' otherwise (e.g. drawing tests,
-      // which have no model yet). The doctor's website updates this to
-      // 'reviewed' once a report has been written for this test.
+      // website to pick up; 'uploaded' otherwise (e.g. an MRI test, which
+      // has no model yet). The doctor's website updates this to 'reviewed'
+      // once a report has been written for this test.
       'status': predictionResult != null ? 'pending_review' : 'uploaded',
     };
     if (predictionResult != null) {

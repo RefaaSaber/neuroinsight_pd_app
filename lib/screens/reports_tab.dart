@@ -25,6 +25,7 @@ class _ReportsTabState extends State<ReportsTab> {
     _load();
   }
 
+  // Loads the user's reports from Firestore.
   Future<void> _load() async {
     final userId = widget.user.id;
     if (userId == null) {
@@ -39,6 +40,7 @@ class _ReportsTabState extends State<ReportsTab> {
     });
   }
 
+  // Marks a "new" report as viewed, then opens its detail screen.
   Future<void> _open(ReportModel report) async {
     final userId = widget.user.id;
     if (userId != null && report.status == ReportStatus.new_) {
@@ -102,7 +104,7 @@ class _ReportsTabState extends State<ReportsTab> {
                                 decoration: cardDecoration(),
                                 child: Row(
                                   children: [
-                                    CircleAvatar(
+                                    const CircleAvatar(
                                       backgroundColor: AppColors.chipNewBg,
                                       child: Icon(Icons.description_outlined, color: AppColors.primary, size: 18),
                                     ),

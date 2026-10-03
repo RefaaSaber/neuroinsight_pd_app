@@ -4,8 +4,8 @@ import '../models/user_model.dart';
 import '../services/db_helper.dart';
 import '../theme/app_theme.dart';
 
-/// Frame 6 — Home. Shows monitoring status, quick actions, and the
-/// signed-in user's real recent tests loaded from Firestore.
+/// Home tab: shows monitoring status, quick actions, and the signed-in
+/// user's recent tests loaded from Firestore.
 class HomeTab extends StatefulWidget {
   final UserModel user;
   final VoidCallback onUploadTapped;
@@ -26,6 +26,7 @@ class _HomeTabState extends State<HomeTab> {
     _loadTests();
   }
 
+  // Loads the user's recent tests from Firestore.
   Future<void> _loadTests() async {
     final userId = widget.user.id;
     if (userId == null) {
@@ -40,6 +41,7 @@ class _HomeTabState extends State<HomeTab> {
     });
   }
 
+  // Picks the right icon for a test's type.
   IconData _iconFor(TestType type) {
     switch (type) {
       case TestType.voice:
@@ -76,7 +78,7 @@ class _HomeTabState extends State<HomeTab> {
                   const SizedBox(height: 16),
                   Container(
                     padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(color: Colors.white.withOpacity(0.12), borderRadius: BorderRadius.circular(12)),
+                    decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(12)),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -163,12 +165,23 @@ class _HomeTabState extends State<HomeTab> {
                               children: [
                                 CircleAvatar(backgroundColor: AppColors.chipNewBg, child: Icon(_iconFor(t.type), color: AppColors.primary, size: 18)),
                                 const SizedBox(width: 12),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(t.title, style: const TextStyle(fontWeight: FontWeight.w600)),
-                                    Text(t.date, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
-                                  ],
+                                // Expanded + ellipsis so a long auto-generated
+                                // filename (e.g. from the image picker) is cut
+                                // off with "..." instead of overflowing the
+                                // card's right edge.
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        t.title,
+                                        style: const TextStyle(fontWeight: FontWeight.w600),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      Text(t.date, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
@@ -185,6 +198,7 @@ class _HomeTabState extends State<HomeTab> {
   }
 }
 
+/// A small tappable card for a quick action, e.g. "Upload Voice".
 class _QuickAction extends StatelessWidget {
   final IconData icon;
   final String title;

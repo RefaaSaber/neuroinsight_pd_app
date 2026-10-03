@@ -1,11 +1,12 @@
+// Third and last sign-up screen: sets the password and checks its
+// strength, then creates the account.
 import 'package:flutter/material.dart';
 import '../../models/signup_data.dart';
 import '../../services/db_helper.dart';
 import '../../theme/app_theme.dart';
 import '../main_shell.dart';
 
-/// Sign Up Step 3 of 3 — Create Password.
-/// This is where the account is actually created in Firebase.
+/// Sign up step 3 of 3: create a password and finish account creation.
 class SignUpStep3Screen extends StatefulWidget {
   final SignupData data;
   const SignUpStep3Screen({super.key, required this.data});
@@ -40,6 +41,8 @@ class _SignUpStep3ScreenState extends State<SignUpStep3Screen> {
   bool get _isPasswordValid =>
       _hasMinLength && _hasUpper && _hasLower && _hasNumber && _hasSpecial;
 
+  // Builds one row of the password-requirements checklist, with a check
+  // or empty circle depending on whether it's met.
   Widget _rule(String text, bool met) {
     return Row(
       children: [
@@ -60,6 +63,8 @@ class _SignUpStep3ScreenState extends State<SignUpStep3Screen> {
     );
   }
 
+  // Validates the password, then creates the account and moves into the
+  // main app on success.
   Future<void> _createAccount() async {
     setState(() => _errorText = null);
 

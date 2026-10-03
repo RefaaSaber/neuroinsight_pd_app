@@ -1,3 +1,5 @@
+// Report Detail screen: shows one doctor-written report in full, with
+// the covered test types, clinical notes, and recommendations.
 import 'package:flutter/material.dart';
 import '../models/report_model.dart';
 import '../models/user_model.dart';
@@ -10,6 +12,8 @@ class ReportDetailScreen extends StatelessWidget {
 
   const ReportDetailScreen({super.key, required this.user, required this.report});
 
+  // Lays out the patient header, test-type chips, assessment card, and
+  // recommendations list (if any) in a scrollable column.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,15 +27,21 @@ class ReportDetailScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 CircleAvatar(backgroundColor: AppColors.primary, child: Text(user.initials, style: const TextStyle(color: Colors.white))),
                 const SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(report.title, style: const TextStyle(fontWeight: FontWeight.w600)),
-                    Text('${report.reportWrittenDate}  •  ${report.doctorName}', style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
-                  ],
+                // Expanded so a long report title (e.g. a combined
+                // multi-test report) wraps onto a second line instead of
+                // overflowing past the right edge of the screen.
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(report.title, style: const TextStyle(fontWeight: FontWeight.w600)),
+                      Text('${report.reportWrittenDate}  •  ${report.doctorName}', style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                    ],
+                  ),
                 ),
               ],
             ),

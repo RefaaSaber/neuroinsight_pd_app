@@ -1,3 +1,4 @@
+// Shared header widget for the multi-step sign-up flow.
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
@@ -7,6 +8,8 @@ class SignUpHeader extends StatelessWidget {
   final VoidCallback onBack;
   const SignUpHeader({super.key, required this.step, required this.onBack});
 
+  // Builds the navy header bar with the back button, step label, and the
+  // row of step-progress dots.
   @override
   Widget build(BuildContext context) {
     return Container(

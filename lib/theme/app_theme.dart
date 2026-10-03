@@ -1,3 +1,4 @@
+// App-wide theme: brand colors, status tones and shared decorations.
 import 'package:flutter/material.dart';
 
 /// Central place for colors, text styles and shared decorations so every
@@ -34,7 +35,10 @@ class AppColors {
   static const chipNewText = Color(0xFF0B2545);
 }
 
+/// Builds the app's Material 3 light theme from the AppColors palette.
 class AppTheme {
+  // Wires AppColors into a ThemeData: color scheme, app bar, cards,
+  // buttons, chips and input fields.
   static ThemeData light() {
     return ThemeData(
       useMaterial3: true,
@@ -139,7 +143,7 @@ BoxDecoration cardDecoration() {
     border: Border.all(color: AppColors.border),
     boxShadow: [
       BoxShadow(
-        color: Colors.black.withOpacity(0.04),
+        color: Colors.black.withValues(alpha: 0.04),
         blurRadius: 12,
         offset: const Offset(0, 4),
       ),

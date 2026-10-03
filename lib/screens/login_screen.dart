@@ -1,3 +1,4 @@
+// The Log In screen.
 import 'package:flutter/material.dart';
 import '../services/db_helper.dart';
 import '../theme/app_theme.dart';
@@ -29,6 +30,8 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  // Validates the form, logs in via DbHelper, and moves to the main app
+  // on success.
   Future<void> _login() async {
     setState(() => _errorText = null);
 
@@ -77,9 +80,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: () => Navigator.of(context).maybePop(),
                     icon: const Icon(Icons.arrow_back, color: Colors.white),
                   ),
-                  Expanded(
+                  const Expanded(
                     child: Column(
-                      children: const [
+                      children: [
                         BrandMark(onDark: true, size: 36),
                         SizedBox(height: 8),
                         Text('NeuroInsight-PD', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),

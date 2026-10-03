@@ -1,3 +1,5 @@
+// Sends pre-computed acoustic features to the hosted voice model and
+// parses its Parkinson's prediction.
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -16,6 +18,7 @@ const List<String> voiceModelFeatureNames = [
   'Delta7', 'Delta8', 'Delta9', 'Delta10', 'Delta11', 'Delta12',
 ];
 
+/// Holds one voice model prediction, parsed from the API's JSON response.
 class VoicePredictionResult {
   final String prediction;
   final int predictionCode;
@@ -51,6 +54,8 @@ class VoiceModelService {
 
   static const _baseUrl = 'https://neuroinsight-voicemodel.onrender.com';
 
+  // Posts the feature map as JSON and returns the parsed prediction.
+  // Throws if the request times out or the API errors.
   Future<VoicePredictionResult> predict(Map<String, double> features) async {
     final uri = Uri.parse('$_baseUrl/predict');
 

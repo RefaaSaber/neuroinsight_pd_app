@@ -1,3 +1,5 @@
+// Second screen of the sign-up flow: a 6-digit OTP entry with a resend
+// countdown timer. The code itself isn't actually checked here yet.
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../models/signup_data.dart';
@@ -5,7 +7,7 @@ import '../../theme/app_theme.dart';
 import '../../widgets/signup_header.dart';
 import 'signup_step3_screen.dart';
 
-/// Frame 4 — Sign Up Step 2 of 3: Verify Your Number (OTP).
+/// Sign up step 2 of 3: verify phone number with an OTP code.
 class SignUpStep2Screen extends StatefulWidget {
   final SignupData data;
   const SignUpStep2Screen({super.key, required this.data});
@@ -26,6 +28,7 @@ class _SignUpStep2ScreenState extends State<SignUpStep2Screen> {
     _startTimer();
   }
 
+  // Resets and restarts the 45-second resend countdown.
   void _startTimer() {
     _timer?.cancel();
     _secondsLeft = 45;

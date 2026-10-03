@@ -1,5 +1,9 @@
+// Data models for the Reports list and the Home "Recent Tests" list.
+
+/// Whether a report has been opened by the patient yet.
 enum ReportStatus { new_, viewed }
 
+/// Which kind of test a row represents.
 enum TestType { voice, drawing, both }
 
 /// A single row in the "Diagnostic Reports" list. Reports are written by a
