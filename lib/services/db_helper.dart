@@ -41,11 +41,6 @@ class DbHelper {
         'phone': phone,
         'dateOfBirth': dateOfBirth,
         'hospitalFileNo': hospitalFileNo,
-        // Lets the doctor/radiologist web portal tell patient accounts apart
-        // from clinical staff accounts, which get 'doctor' / 'radiologist'
-        // here instead. Patients made before this field existed are treated
-        // as patients too (see the web repository's handling of a missing
-        // role).
         'role': 'patient',
       });
 
