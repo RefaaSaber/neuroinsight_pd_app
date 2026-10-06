@@ -2,23 +2,27 @@
 /// Firestore (see lib/services/db_helper.dart).
 class UserModel {
   final String? id;
+  final String firstName;
+  final String lastName;
   final String fullName;
   final String displayName;
   final String role;
   final String nationalId;
   final String dateOfBirth;
-  final String hospitalFileNo;
+  final String patientFileNo;
   String email;
   String phoneNumber;
 
   UserModel({
     this.id,
+    this.firstName = '',
+    this.lastName = '',
     required this.fullName,
     required this.displayName,
     required this.role,
     required this.nationalId,
     required this.dateOfBirth,
-    required this.hospitalFileNo,
+    required this.patientFileNo,
     this.email = '',
     this.phoneNumber = '',
   });

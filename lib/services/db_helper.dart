@@ -19,6 +19,8 @@ class DbHelper {
   // Creates the Firebase Auth account and the matching Firestore user
   // document (always saved with role 'patient'). Returns null on failure.
   Future<UserModel?> createUser({
+    required String firstName,
+    required String lastName,
     required String fullName,
     required String nationalId,
     required String email,
@@ -32,26 +34,30 @@ class DbHelper {
         password: password,
       );
       final uid = credential.user!.uid;
-      final hospitalFileNo = 'KAU-${DateTime.now().year}-${(1000 + nationalId.hashCode.abs() % 9000)}';
+      final patientFileNo = 'KAU-${DateTime.now().year}-${(1000 + nationalId.hashCode.abs() % 9000)}';
 
       await _db.collection('users').doc(uid).set({
+        'firstName': firstName,
+        'lastName': lastName,
         'fullName': fullName,
         'nationalId': nationalId,
         'email': email,
         'phone': phone,
         'dateOfBirth': dateOfBirth,
-        'hospitalFileNo': hospitalFileNo,
+        'patientFileNo': patientFileNo,
         'role': 'patient',
       });
 
       return UserModel(
         id: uid,
+        firstName: firstName,
+        lastName: lastName,
         fullName: fullName,
         displayName: fullName,
         role: 'Patient',
         nationalId: nationalId,
         dateOfBirth: dateOfBirth,
-        hospitalFileNo: hospitalFileNo,
+        patientFileNo: patientFileNo,
         email: email,
         phoneNumber: phone,
       );
@@ -76,12 +82,15 @@ class DbHelper {
 
       return UserModel(
         id: uid,
+        // Older accounts only have fullName, so split it as a fallback.
+        firstName: data['firstName'] ?? ((data['fullName'] ?? '') as String).split(' ').first,
+        lastName: data['lastName'] ?? ((data['fullName'] ?? '') as String).split(' ').skip(1).join(' '),
         fullName: data['fullName'] ?? '',
         displayName: data['fullName'] ?? '',
         role: 'Patient',
         nationalId: data['nationalId'] ?? '',
         dateOfBirth: data['dateOfBirth'] ?? '',
-        hospitalFileNo: data['hospitalFileNo'] ?? '',
+        patientFileNo: data['patientFileNo'] ?? '',
         email: data['email'] ?? '',
         phoneNumber: data['phone'] ?? '',
       );

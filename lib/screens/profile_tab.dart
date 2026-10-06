@@ -152,10 +152,11 @@ class _ProfileTabState extends State<ProfileTab> {
                 decoration: cardDecoration(),
                 child: Column(
                   children: [
-                    _readOnlyField('Full Name', user.fullName),
+                    _readOnlyField('First Name', user.firstName),
+                    _readOnlyField('Last Name', user.lastName),
                     _readOnlyField('National ID', user.nationalId),
                     _readOnlyField('Date of Birth', user.dateOfBirth),
-                    _readOnlyField('Hospital File No.', user.hospitalFileNo),
+                    _readOnlyField('Patient File No.', user.patientFileNo),
                   ],
                 ),
               ),

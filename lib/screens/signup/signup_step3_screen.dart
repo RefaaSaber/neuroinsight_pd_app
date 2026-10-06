@@ -80,6 +80,8 @@ class _SignUpStep3ScreenState extends State<SignUpStep3Screen> {
     setState(() => _loading = true);
 
     final user = await DbHelper.instance.createUser(
+      firstName: widget.data.firstName,
+      lastName: widget.data.lastName,
       fullName: widget.data.fullName,
       nationalId: widget.data.nationalId,
       email: widget.data.email,

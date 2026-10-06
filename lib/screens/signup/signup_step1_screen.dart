@@ -1,6 +1,7 @@
 // First screen of the sign-up flow: collects the user's personal info
 // before moving on to phone verification.
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../models/signup_data.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/signup_header.dart';
@@ -15,7 +16,8 @@ class SignUpStep1Screen extends StatefulWidget {
 }
 
 class _SignUpStep1ScreenState extends State<SignUpStep1Screen> {
-  final _fullNameController = TextEditingController();
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
   final _nationalIdController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
@@ -24,7 +26,8 @@ class _SignUpStep1ScreenState extends State<SignUpStep1Screen> {
 
   @override
   void dispose() {
-    _fullNameController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
     _nationalIdController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
@@ -34,7 +37,8 @@ class _SignUpStep1ScreenState extends State<SignUpStep1Screen> {
 
   // Checks all fields are filled, then moves to the next step with the data collected so far.
   void _continue() {
-    if (_fullNameController.text.trim().isEmpty ||
+    if (_firstNameController.text.trim().isEmpty ||
+        _lastNameController.text.trim().isEmpty ||
         _nationalIdController.text.trim().isEmpty ||
         _emailController.text.trim().isEmpty ||
         _phoneController.text.trim().isEmpty ||
@@ -42,10 +46,21 @@ class _SignUpStep1ScreenState extends State<SignUpStep1Screen> {
       setState(() => _errorText = 'Please fill in all fields.');
       return;
     }
+    if (_nationalIdController.text.trim().length != 10) {
+      setState(() => _errorText = 'National ID must be exactly 10 digits.');
+      return;
+    }
+    if (_phoneController.text.trim().length != 8) {
+      setState(() => _errorText = 'Phone number must be exactly 8 digits.');
+      return;
+    }
     setState(() => _errorText = null);
 
     final data = SignupData(
-      fullName: _fullNameController.text.trim(),
+      firstName: _firstNameController.text.trim(),
+      lastName: _lastNameController.text.trim(),
+      fullName:
+          '${_firstNameController.text.trim()} ${_lastNameController.text.trim()}',
       nationalId: _nationalIdController.text.trim(),
       email: _emailController.text.trim(),
       phone: _phoneController.text.trim(),
@@ -74,13 +89,23 @@ class _SignUpStep1ScreenState extends State<SignUpStep1Screen> {
                     const SizedBox(height: 4),
                     const Text('Enter your details to create your account.', style: TextStyle(color: AppColors.textSecondary)),
                     const SizedBox(height: 24),
-                    const Text('Full Name', style: TextStyle(fontWeight: FontWeight.w600)),
+                    const Text('First Name', style: TextStyle(fontWeight: FontWeight.w600)),
                     const SizedBox(height: 6),
-                    TextField(controller: _fullNameController, decoration: const InputDecoration(hintText: 'Enter your full name')),
+                    TextField(controller: _firstNameController, decoration: const InputDecoration(hintText: 'Enter your first name')),
+                    const SizedBox(height: 16),
+                    const Text('Last Name', style: TextStyle(fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 6),
+                    TextField(controller: _lastNameController, decoration: const InputDecoration(hintText: 'Enter your last name')),
                     const SizedBox(height: 16),
                     const Text('National ID', style: TextStyle(fontWeight: FontWeight.w600)),
                     const SizedBox(height: 6),
-                    TextField(controller: _nationalIdController, keyboardType: TextInputType.number, decoration: const InputDecoration(hintText: 'Enter your National ID')),
+                    TextField(
+                      controller: _nationalIdController,
+                      keyboardType: TextInputType.number,
+                      maxLength: 10,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      decoration: const InputDecoration(hintText: 'Enter your National ID', counterText: ''),
+                    ),
                     const SizedBox(height: 16),
                     const Text('Email Address', style: TextStyle(fontWeight: FontWeight.w600)),
                     const SizedBox(height: 6),
@@ -88,7 +113,21 @@ class _SignUpStep1ScreenState extends State<SignUpStep1Screen> {
                     const SizedBox(height: 16),
                     const Text('Phone Number', style: TextStyle(fontWeight: FontWeight.w600)),
                     const SizedBox(height: 6),
-                    TextField(controller: _phoneController, keyboardType: TextInputType.phone, decoration: const InputDecoration(hintText: '+966 5XX XXX XXXX')),
+                    TextField(
+                      controller: _phoneController,
+                      keyboardType: TextInputType.phone,
+                      maxLength: 8,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      decoration: const InputDecoration(hintText: 'Enter your phone number',counterText: '',
+                      prefixIcon: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 12),
+                     child: Center(
+                     widthFactor: 1,
+                    child: Text('+966', style: TextStyle(fontWeight: FontWeight.w600)),
+                     ),
+                     ),
+                     ),
+                     ),
                     const SizedBox(height: 16),
                     const Text('Date of Birth', style: TextStyle(fontWeight: FontWeight.w600)),
                     const SizedBox(height: 6),

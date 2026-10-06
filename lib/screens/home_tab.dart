@@ -147,7 +147,7 @@ class _HomeTabState extends State<HomeTab> {
                     ],
                   ),
                   const SizedBox(height: 24),
-                  const Text('Recent Tests', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+                  const Text('My Uplods', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
                   const SizedBox(height: 12),
                   if (_loading)
                     const Padding(

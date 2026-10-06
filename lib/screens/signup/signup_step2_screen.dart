@@ -69,7 +69,10 @@ class _SignUpStep2ScreenState extends State<SignUpStep2Screen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Enter Verification Code', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    const Text(
+                    'Enter the verification code sent to your mobile number',
+                   style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                     ),
                     const SizedBox(height: 4),
                     Text(
                       'A 6-digit code was sent to your phone number\n${widget.data.phone}',
