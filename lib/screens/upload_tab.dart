@@ -69,7 +69,7 @@ class _UploadTabState extends State<UploadTab> {
   Map<String, double>? _parseFeaturesFromCsv(String content) {
     final rows = const CsvToListConverter(eol: '\n').convert(content);
     if (rows.length < 2) {
-      _showError('That CSV file needs a header row and at least one data row.');
+      _showError('That CSV file needs a header row and one data row.');
       return null;
     }
 

@@ -42,8 +42,7 @@ class _HomeTabState extends State<HomeTab> {
     });
   }
 
-  // Opens the full-size image for a test that has one. Voice tests (and
-  // any older drawing test with no saved image) have no [fileUrl], so
+  // Opens the full-size image for a test that has one. Voice tests have no [fileUrl], so
   // tapping those rows does nothing.
   void _openTest(RecentTestModel test) {
     final url = test.fileUrl;
@@ -147,7 +146,7 @@ class _HomeTabState extends State<HomeTab> {
                     ],
                   ),
                   const SizedBox(height: 24),
-                  const Text('My Uplods', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+                  const Text('My Uploads', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
                   const SizedBox(height: 12),
                   if (_loading)
                     const Padding(
