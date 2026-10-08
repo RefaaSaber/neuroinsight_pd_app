@@ -7,7 +7,7 @@ import '../models/report_model.dart';
 import '../models/user_model.dart';
 
 /// Real, cloud-backed persistence via Firebase Authentication + Cloud
-/// Firestore. Any client (this app, or the companion website) connected to
+/// Firestore. Any client (this app, or the website) connected to
 /// the same Firebase project sees the same accounts and data.
 class DbHelper {
   DbHelper._();
@@ -82,9 +82,8 @@ class DbHelper {
 
       return UserModel(
         id: uid,
-        // Older accounts only have fullName, so split it as a fallback.
-        firstName: data['firstName'] ?? ((data['fullName'] ?? '') as String).split(' ').first,
-        lastName: data['lastName'] ?? ((data['fullName'] ?? '') as String).split(' ').skip(1).join(' '),
+        firstName: data['firstName'] ?? '',
+        lastName: data['lastName'] ?? '',
         fullName: data['fullName'] ?? '',
         displayName: data['fullName'] ?? '',
         role: 'Patient',
@@ -119,6 +118,32 @@ class DbHelper {
     await _db.collection('users').doc(userId).update({'email': email, 'phone': phone});
   }
 
+  // Converts the 'type' text saved in Firestore into a TestType.
+  // The radiologist's web portal saves MRI scans as 'mri'.
+  TestType _testTypeFromString(String? value) {
+    switch (value) {
+      case 'voice':
+        return TestType.voice;
+      case 'mri':
+        return TestType.mri;
+      default:
+        return TestType.drawing;
+    }
+  }
+
+  // Converts a TestType back into the text saved in Firestore.
+  String _testTypeToString(TestType type) {
+    switch (type) {
+      case TestType.voice:
+        return 'voice';
+      case TestType.mri:
+        return 'mri';
+      case TestType.drawing:
+      case TestType.both:
+        return 'drawing';
+    }
+  }
+
   // Fetches this user's test history, newest first.
   Future<List<RecentTestModel>> getTests(String userId) async {
     final snapshot = await _db
@@ -133,16 +158,15 @@ class DbHelper {
       return RecentTestModel(
         title: data['title'] as String,
         date: data['date'] as String,
-        type: (data['type'] as String) == 'voice' ? TestType.voice : TestType.drawing,
+        type: _testTypeFromString(data['type'] as String?),
         fileUrl: data['fileUrl'] as String?,
       );
     }).toList();
   }
 
-  /// Saves a test record. When [predictionResult] is given (voice and
-  /// drawing tests both have live models now), it's stored alongside the
+  /// Saves a test record. When [predictionResult] is given it's stored alongside the
   /// test so the Reports tab — and the doctor's website — can show a real
-  /// result. When [fileUrl] is given (e.g. a drawing photo uploaded to
+  /// result. When [fileUrl] is given (e.g. a drawing pr mri photo uploaded to
   /// Cloudinary), the doctor's website can open the original file, not
   /// just see the AI's prediction.
   Future<void> addTest({
@@ -156,11 +180,10 @@ class DbHelper {
     final data = <String, dynamic>{
       'title': title,
       'date': date,
-      'type': type == TestType.voice ? 'voice' : 'drawing',
+      'type': _testTypeToString(type),
       'createdAt': FieldValue.serverTimestamp(),
       // 'pending_review' once an AI prediction exists for the doctor's
-      // website to pick up; 'uploaded' otherwise (e.g. an MRI test, which
-      // has no model yet). The doctor's website updates this to 'reviewed'
+      // website to pick up; 'uploaded'  The doctor's website updates this to 'reviewed'
       // once a report has been written for this test.
       'status': predictionResult != null ? 'pending_review' : 'uploaded',
     };

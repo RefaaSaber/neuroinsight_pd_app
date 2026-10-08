@@ -14,18 +14,18 @@ class UserModel {
   String phoneNumber;
 
   UserModel({
-    this.id,
-    this.firstName = '',
-    this.lastName = '',
-    required this.fullName,
-    required this.displayName,
-    required this.role,
-    required this.nationalId,
-    required this.dateOfBirth,
-    required this.patientFileNo,
-    this.email = '',
-    this.phoneNumber = '',
-  });
+  this.id,
+  required this.firstName,
+  required this.lastName,
+  required this.fullName,
+  required this.displayName,
+  required this.role,
+  required this.nationalId,
+  required this.dateOfBirth,
+  required this.patientFileNo,
+  required this.email,
+  required this.phoneNumber,
+});
 
   String get initials {
     final parts = displayName.trim().split(RegExp(r'\s+'));

@@ -5,9 +5,7 @@ import 'package:http/http.dart' as http;
 
 // Uploads a spiral-drawing photo to Cloudinary so there's a URL the doctor
 // can open on the website to see the actual image, not just the AI's
-// prediction. Same Cloudinary account and upload preset as the companion
-// website (SeniorProject-Web-'s CloudinaryUploadService), so files from
-// either app land in the same place.
+// prediction.
 
 /// Uploads a file to Cloudinary using an unsigned upload preset, so no
 /// secret key is needed in the app's code.

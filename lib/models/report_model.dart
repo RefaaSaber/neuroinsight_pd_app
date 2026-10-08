@@ -1,13 +1,13 @@
-// Data models for the Reports list and the Home "Recent Tests" list.
+// Data models for the Reports list and the Home "My uploads" list.
 
 /// Whether a report has been opened by the patient yet.
 enum ReportStatus { new_, viewed }
 
 /// Which kind of test a row represents.
-enum TestType { voice, drawing, both }
+enum TestType { voice, drawing, mri, both }
 
 /// A single row in the "Diagnostic Reports" list. Reports are written by a
-/// doctor (on the companion web portal) after reviewing an AI analysis —
+/// doctor (on the  web portal) after reviewing an AI analysis —
 /// one report can cover several of the patient's tests at once — then
 /// synced back here via Firestore once the doctor submits it (see
 /// lib/services/db_helper.dart's getReports()). A doctor's saved draft is
@@ -43,7 +43,7 @@ class ReportModel {
   });
 }
 
-/// A single row in the Home / Upload "Recent Tests" list. Backed by
+/// A single row in the Home / Upload "My uploads" list. Backed by
 /// Firebase — one row per test the signed-in user has actually uploaded
 /// (see lib/services/db_helper.dart).
 class RecentTestModel {
@@ -51,9 +51,8 @@ class RecentTestModel {
   final String date;
   final TestType type;
 
-  /// Link to the uploaded photo (spiral drawing), if one was saved —
-  /// null for a voice test, or an older drawing test uploaded before this
-  /// was tracked.
+  /// Link to the uploaded photo (spiral drawing) or mri, if one was saved —
+  /// null for a voice test
   final String? fileUrl;
 
   const RecentTestModel({

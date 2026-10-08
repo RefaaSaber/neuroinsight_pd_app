@@ -59,6 +59,8 @@ class _HomeTabState extends State<HomeTab> {
     switch (type) {
       case TestType.voice:
         return Icons.mic_none_outlined;
+      case TestType.mri:
+        return Icons.medical_services_outlined;
       case TestType.drawing:
       case TestType.both:
         return Icons.edit_outlined;
@@ -180,13 +182,10 @@ class _HomeTabState extends State<HomeTab> {
                             child: Row(
                               children: [
                                 // Shows a thumbnail of the uploaded photo
-                                // when one was saved (drawing tests only),
+                                // when one was saved (drawing tests ),
                                 // so the patient can see what they
-                                // submitted — falls back to the plain
-                                // icon avatar otherwise (voice tests, or
-                                // an older drawing test with no saved
-                                // image).
-                                if (t.fileUrl != null)
+                                // submitted 
+                                    if (t.fileUrl != null)
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(10),
                                     child: Image.network(
