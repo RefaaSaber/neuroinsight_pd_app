@@ -1,0 +1,18 @@
+00:00 +0: loading /Users/rfrf/Developer/neuroinsight_pd_app/test/auth_screens_test.dart
+00:00 +0: Test case 1: Login with empty fields
+00:00 +1: Test case 2: Login with empty password
+00:00 +2: Test case 3: Reset password with empty email
+00:00 +3: Test case 4: Reset password with invalid email format
+00:00 +4: Test case 5: Sign up with one empty field
+00:01 +5: Test case 6: National ID shorter than 10 digits
+00:01 +6: Test case 7: Phone shorter than 8 digits
+00:01 +7: Test case 8: National ID with letters
+00:01 +8: Test case 9: Password shorter than 8 characters
+00:01 +9: Test case 10: Password without a capital letter
+00:01 +10: Test case 11: Password without a lowercase letter
+00:01 +11: Test case 12: Password without a number
+00:02 +12: Test case 13: Password without a special character
+00:02 +13: Test case 14: Passwords do not match
+00:02 +14: Test case 15: Strong password shows 5 ticks
+00:02 +15: Test case 16: Password without a capital letter shows 4 ticks
+00:02 +16: All tests passed!
